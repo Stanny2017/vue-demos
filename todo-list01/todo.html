@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>todo-list demo01</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <style>
+        #todo-list-demo{
+            margin:50px auto;
+            background: azure;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="todo-list-demo">
+        <h1>Todo-list</h1>
+        <input type="text" placeholder="please input your todo-list" @keyup.enter="additem" v-model="newItem">
+        <ul>
+            <todo-item v-for="(todo,index) in todolist" v-bind:todo="todo" v-bind:index="index" v-bind:remove="remove">
+            </todo-item>
+        </ul>
+
+    </div>
+    <script>
+
+        Vue.component('todo-item', {
+            props: ['todo','index','remove'],
+            template: '<li>{{todo.item}} <button @click="remove(index)">X</button> </li>'
+        })
+        var vm = new Vue({
+            el: "#todo-list-demo",
+            data: {
+                newItem: '',
+                todolist: [
+                    { id: 0, item: 'finish vue demo' },
+                    { id: 1, item: 'finish es6 learn' }
+                ]
+            },
+            methods: {
+                remove: function (index) {
+                    this.todolist.splice(index,1);
+                },
+                additem: function () {
+                    this.todolist.push({
+                        id: this.todolist.length,
+                        item: this.newItem
+                    });
+                    this.newItem = "";
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>
