@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <title>购物车</title>
+    <style>
+        #shopping-list {
+            background: azure;
+        }
+
+        #product-info {
+            display: inline-block;
+            /* background: aqua; */
+        }
+
+        table {
+            border: grey 2px solid;
+            border-spacing: 0;
+            width: 80%;
+            text-align: center;
+            font-size: 15px;
+        }
+
+        table td {
+            border: solid 1px grey;
+        }
+
+        img {
+            border: solid 1px grey;
+            padding: 2px;
+        }
+
+        .cart-product-info p {
+            display: inline;
+            margin: 0 100px 0 600px;
+        }
+
+        .td-price,
+        .td-total,
+        .cart-product-info p span {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="shopping-list">
+        <h3 style="color: cadetblue">购物清单</h3>
+        <table>
+            <thead>
+                <tr style="font-size: 20px">
+                    <th>
+                
+                    <input type="checkbox" v-model="isSelectedAll" @click="selectProduct(isSelectedAll)"> 全选</th>
+                    <th>商品</th>
+                    <th>数量</th>
+                    <th>单价</th>
+                    <th>金额</th>
+                    <th>删除</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item,index) in productList">
+                    <td class="td-check">
+                        <input type="checkbox" v-model="item.selected">
+                    </td>
+                    <td class="td-product">
+                        <img v-bind:src="item.pro_img" alt="商品图片" width="98px" height="98px">
+                        <div id="product-info" class="product-info">
+                            <h4>{{item.pro_name}}</h4>
+                            <p>
+                                <strong>品牌：</strong> {{item.pro_brand}}&nbsp;&nbsp;产地：{{item.pro_place}}</p>
+                            <p>规格/纯度:{{item.pro_purity}}&nbsp;&nbsp;起定量：{{item.pro_min}}</p>
+                            <p>配送仓储：{{item.pro_depot}}</p>
+                        </div>
+                    </td>
+                    <td class="td-num">
+                        <div class="product-num">
+                            <button class="num-reduce" @click="item.pro_num--">-</button>
+                            <input type="text" class="num-input" v-model="item.pro_num">
+                            <button class="num-plus" @click="item.pro_num++">+</button>
+                        </div>
+                    </td>
+                    <td class="td-price">
+                        <p class="red-text">￥
+                            <span>{{item.pro_price.toFixed(2)}}</span>
+                        </p>
+                    </td>
+                    <td class="td-total">
+                        <p class="red-text">￥
+                            <span>{{(item.pro_price*item.pro_num).toFixed(2)}}</span>
+                        </p>
+                    </td>
+                    <td class="td-del">
+                        <a href="javascript:;" @click="delOneProduct(index)">删除</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="cart-product-info">
+            <a href="javascript:;" v-on:click="delProduct">删除所选商品</a>
+            <a href="javascript:;">继续购物</a>
+            <p>
+                <span>{{getTotal.num}}</span>件商品共计:
+                <span> ￥</span>
+                <span>{{getTotal.price}}</span>
+                <span></span>
+            </p>
+            <a href="javascript:;">去结算</a>
+        </div>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: "#shopping-list",
+            data: {
+                
+                productList: [
+                    {
+                        'pro_name': '【斯文】甘油 | 丙三醇',//产品名称
+                        'pro_brand': 'skc',//品牌名称
+                        'pro_place': '韩国',//产地
+                        'pro_purity': '99.7%',//规格
+                        'pro_min': "215千克",//最小起订量
+                        'pro_depot': '上海仓海仓储',//所在仓库
+                        'pro_num': 3,//数量
+                        'pro_img': './img/中国移动.jpg',//图片链接
+                        'pro_price': 800//单价
+                    },
+                    {
+                        'pro_name': '【斯文】甘油 | 丙三醇',//产品名称
+                        'pro_brand': 'skc',//品牌名称
+                        'pro_place': '韩国',//产地
+                        'pro_purity': '99.7%',//规格
+                        'pro_min': "215千克",//最小起订量
+                        'pro_depot': '上海仓海仓储',//所在仓库
+                        'pro_num': 3,//数量
+                        'pro_img': 'img/2.jpg',//图片链接
+                        'pro_price': 800//单价
+                    }
+                ]
+            },
+            computed: {
+                isSelectedAll: function (){
+                    // Array.every() 如果数组的每一项都返回 true 则返回 true
+                    return this.productList.every(function(item){
+                        return item.selected;
+                    })
+                },
+                // 计算属性 默认只有getter
+                getTotal: {
+                    get: function () {
+                        
+                        var pro_buy = this.productList.filter(function (item) {
+                            return (item.selected === true)
+                        })
+
+
+                        var totalNum = pro_buy.length;
+                        
+                        var totalPrice = 0;
+                        for (let i = 0; i < totalNum; i++) {
+                            totalPrice += pro_buy[i].pro_num * pro_buy[i].pro_price
+                        }
+                        return {
+                            num: totalNum,
+                            price: totalPrice.toFixed(2)
+                        }
+                    },
+                    set: function (newVaule) {
+
+                    }
+                }
+            },
+            methods: {
+                selectProduct: function(_isselected){
+                    for(let i=0;i<this.productList.length;i++){
+                        this.productList[i].selected = !_isselected
+                    }
+                },
+                delOneProduct: function(index){
+                    this.productList.splice(index,1)
+                },
+                delProduct: function(){
+                    this.productList = this.productList.filter(function (item){
+                        return item.selected === false;
+                    })
+                }
+            },
+            mounted: function () {
+                var _this = this;
+                this.productList.map(function (item) {
+                    _this.$set(item, 'selected', false)
+                })
+            }
+
+        })
+    </script>
+</body>
+</html>
