@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Get-Things-done 任务列表 </title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <style>
+        #todo-list {
+            width: 60%;
+            background: aliceblue;
+            margin: 20px auto;
+        }
+
+        .target-computed>span {
+            color: cadetblue;
+        }
+
+        .todo-items ul li button {
+            /* position: absolute; */
+            /* top: 50%; */
+            height: 28px;
+            float: right;
+            /* margin-top: -10px; */
+            /* margin-left: 290px; */
+            /* display: table-cell; */
+            /* vertical-align: middle; */
+        }
+
+        .todo-items ul li {
+            width: 400px;
+            height: 30px;
+            /* position: relative; */
+        }
+
+        .todo-items ul li:hover {
+            background: lightskyblue;
+        }
+
+        .todo-items {
+            border: 2px solid lightskyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="todo-list">
+        <h1>小目标列表</h1>
+        <h2>添加小目标</h2>
+        <input type="text" v-model="newTodo" @keyup.enter="addTodo" placeholder="please input things to-do">
+        <p class="target-computed">共有
+            <span>{{todos.length}}</span> 个目标，已完成
+            <span>{{completedNum}}</span> 个,还有
+            <span>{{uncompletedNum}}</span> 个未完成</p>
+        <p>
+            <input type="radio" id="all" value="all" @click="chooseType('all')" v-model="picked">
+            <label for="all">All</label>
+            <input type="radio" id="completed" value="completed" @click="chooseType('completed')" v-model="picked">
+            <label for="completed">Completed</label>
+            <input type="radio" id="notCompleted" value="notCompleted" @click="chooseType('notCompleted')" v-model="picked">
+            <label for="notCompleted">notCompleted</label>
+            <br>
+            <span>Picked: {{ picked }}</span>
+        </p>
+        <div class="todo-items">
+            <ul>
+                <li v-for="(item,index) in newTodos">
+                    <input type="checkbox" v-model="newTodos[index].status">{{item.text}}
+                    <button @click="delItem(item)">X</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: "#todo-list",
+            data: {
+                picked: "all",
+                newTodo: "",
+                todos: [
+                    { id: 0, text: "item-01", status: false },
+                    { id: 1, text: "item-02", status: false }
+                ],
+                newTodos: []
+            },
+            computed: {
+                completedNum: function (){
+                    return this.todos.filter(function(item){
+                        return item.status;
+                    }).length;
+                },
+                uncompletedNum: function(){
+                    return this.todos.filter(function(item){
+                        return !item.status;
+                    }).length;
+                }
+            },
+            methods: {
+                chooseType: function (picked) {
+                    switch (picked) {
+                        case 'all': this.newTodos = this.todos; break;
+                        case 'completed': this.newTodos = this.todos.filter(function (item) {
+                            return item.status===true;
+                        }); break;
+                        case 'notCompleted': this.newTodos = this.todos.filter(function (item) {
+                            return !item.status;
+                        }); break;
+                    }
+                },
+
+                addTodo: function () {
+                    this.todos.push({ id: this.newTodo.length, text: this.newTodo, status: false });
+                    this.newTodo = "";
+                },
+                delItem: function (item) {
+                    var index = this.todos.indexOf(item);
+                    this.todos.splice(index, 1);
+                    this.chooseType(this.picked);
+                }
+            },
+            mounted: function(){
+                // 初始化，默认显示
+                this.newTodos=this.todos;
+            }
+        })
+    </script>
+</body>
+
+</html>
